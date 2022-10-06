@@ -241,7 +241,7 @@ This will make all strings about 40% longer.
   strings.formatString('fridge.missing.subnode')
 ```
 
-**Beware: do not define a string key as formatString!**
+**Beware: do not define a string key as formatString, setLanguage, setContant or getAvailableLangupropl!**
 
 - setContent(props) - to dynamically load another set of strings
 - getAvailableLanguages() - to get an array of the languages passed in the constructor

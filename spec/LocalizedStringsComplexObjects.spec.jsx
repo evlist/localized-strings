@@ -40,6 +40,8 @@ describe('Testing main Library Functions with complex objects', () => {
   let allStrings, strings;
 
   beforeEach(() => {
+    const nonExtensible = { a: 5 };
+    Object.preventExtensions(nonExtensible);
     allStrings = {
       en: {
         language: 'english',
@@ -62,12 +64,13 @@ describe('Testing main Library Functions with complex objects', () => {
             c: 'in English only',
           },
         ],
+        plainObjectInFunction: () => ({
+          a: 'aaa',
+          b: 'bbb',
+          c: 'in English only',
+        }),
+        nonExtensible: { b: 5 },
       },
-      plainObjectInFunction: () => ({
-        a: 'aaa',
-        b: 'bbb',
-        c: 'in English only',
-      }),
       it: {
         language: 'italian',
         jsxDom: <p>Come vuoi il tuo uovo oggi?</p>,
@@ -85,6 +88,7 @@ describe('Testing main Library Functions with complex objects', () => {
           a: 'aaa2',
           b: 'bbb2',
         }),
+        nonExtensible: nonExtensible,
       },
     };
     strings = new LocalizedStrings(allStrings, { logsEnabled: false });
@@ -150,5 +154,11 @@ describe('Testing main Library Functions with complex objects', () => {
   it('checking JSX Dom nodes fallbacks', () => {
     strings.setLanguage('de');
     expect(strings.jsxDom.key).toEqual('div');
+  });
+
+  // Switch language
+  it('checking non extensible objects', () => {
+    strings.setLanguage('it');
+    expect(strings.nonExtensible).toEqual({ a: 5 });
   });
 });
