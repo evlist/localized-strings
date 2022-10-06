@@ -5,50 +5,48 @@ describe('Main Library Functions', () => {
    * Load up language file to use during tests
    */
   global.navigator = {};
-  let strings;
+  let strings, allStrings;
 
   beforeEach(() => {
-    strings = new LocalizedStrings(
-      {
-        en: {
-          language: 'english',
-          how: 'How do you want your egg today?',
-          boiledEgg: 'Boiled egg',
-          softBoiledEgg: 'Soft-boiled egg',
-          choice: 'How to choose the egg',
-          formattedValue: "I'd like some {0} and {1}, or just {0}",
-          ratings: {
-            excellent: 'excellent',
-            good: 'good',
-            missingComplex: 'missing value',
-          },
-          missing: 'missing value',
-          currentDate: 'The current date is {month} {day}, {year}!',
-          falsy: '{0} {1} {2} {3} {4} {5}',
-          empty: '',
-          reference: '$ref{ratings.excellent}',
-          referenceAdvanced: '$ref{falsy}',
-          anArray: ['excellent', 'good', 'missing'],
+    allStrings = {
+      en: {
+        language: 'english',
+        how: 'How do you want your egg today?',
+        boiledEgg: 'Boiled egg',
+        softBoiledEgg: 'Soft-boiled egg',
+        choice: 'How to choose the egg',
+        formattedValue: "I'd like some {0} and {1}, or just {0}",
+        ratings: {
+          excellent: 'excellent',
+          good: 'good',
+          missingComplex: 'missing value',
         },
-        it: {
-          language: 'italian',
-          how: 'Come vuoi il tuo uovo oggi?',
-          boiledEgg: 'Uovo sodo',
-          softBoiledEgg: 'Uovo alla coque',
-          choice: "Come scegliere l'uovo",
-          ratings: {
-            excellent: 'eccellente',
-            good: 'buono',
-          },
-          formattedValue: "Vorrei un po' di {0} e {1}, o solo {0}",
-          currentDate: 'La data corrente è {month} {day}, {year}!',
-          falsy: '{0} {1} {2} {3} {4} {5}',
-          empty: '',
-          anArray: ['eccellente', 'buono'],
-        },
+        missing: 'missing value',
+        currentDate: 'The current date is {month} {day}, {year}!',
+        falsy: '{0} {1} {2} {3} {4} {5}',
+        empty: '',
+        reference: '$ref{ratings.excellent}',
+        referenceAdvanced: '$ref{falsy}',
+        anArray: ['excellent', 'good', 'missing'],
       },
-      { logsEnabled: false }
-    );
+      it: {
+        language: 'italian',
+        how: 'Come vuoi il tuo uovo oggi?',
+        boiledEgg: 'Uovo sodo',
+        softBoiledEgg: 'Uovo alla coque',
+        choice: "Come scegliere l'uovo",
+        ratings: {
+          excellent: 'eccellente',
+          good: 'buono',
+        },
+        formattedValue: "Vorrei un po' di {0} e {1}, o solo {0}",
+        currentDate: 'La data corrente è {month} {day}, {year}!',
+        falsy: '{0} {1} {2} {3} {4} {5}',
+        empty: '',
+        anArray: ['eccellente', 'buono'],
+      },
+    };
+    strings = new LocalizedStrings(allStrings, { logsEnabled: false });
   });
 
   it('Set default language to en', () => {
@@ -57,6 +55,23 @@ describe('Main Library Functions', () => {
 
   it('List available languages', () => {
     expect(strings.getAvailableLanguages()).toEqual(['en', 'it']);
+  });
+
+  // Mutation
+  it('checks an initial value of the allStrings object', () => {
+    expect(allStrings.it.ratings).toEqual({
+      excellent: 'eccellente',
+      good: 'buono',
+    });
+  });
+
+  it('checks that setting a language mutates the initial allStrings object', () => {
+    strings.setLanguage('it');
+    expect(allStrings.it.ratings).toEqual({
+      excellent: 'eccellente',
+      good: 'buono',
+      missingComplex: 'missing value',
+    });
   });
 
   // Default language

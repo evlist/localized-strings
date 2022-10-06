@@ -90,22 +90,6 @@ describe('Testing main Library Functions with complex objects', () => {
     strings = new LocalizedStrings(allStrings, { logsEnabled: false });
   });
 
-  it('checking an initial value of the allStrings object', () => {
-    expect(allStrings.it.plainObject).toEqual({
-      a: 'aaa2',
-      b: 'bbb2',
-    });
-  });
-
-  it('checking that setting a language mutates the initial allStrings object', () => {
-    strings.setLanguage('it');
-    expect(allStrings.it.plainObject).toEqual({
-      a: 'aaa2',
-      b: 'bbb2',
-      c: 'in English only',
-    });
-  });
-
   it('checking plain objects from the default language', () => {
     expect(strings.plainObject).toEqual({
       a: 'aaa',
