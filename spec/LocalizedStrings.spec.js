@@ -28,6 +28,7 @@ describe('Main Library Functions', () => {
           empty: '',
           reference: '$ref{ratings.excellent}',
           referenceAdvanced: '$ref{falsy}',
+          anArray: ['excellent', 'good', 'missing'],
         },
         it: {
           language: 'italian',
@@ -43,9 +44,10 @@ describe('Main Library Functions', () => {
           currentDate: 'La data corrente è {month} {day}, {year}!',
           falsy: '{0} {1} {2} {3} {4} {5}',
           empty: '',
+          anArray: ['eccellente', 'buono'],
         },
       },
-      { logsEnabled: false },
+      { logsEnabled: false }
     );
   });
 
@@ -72,7 +74,7 @@ describe('Main Library Functions', () => {
   });
   it('Format string in default language', () => {
     expect(
-      strings.formatString(strings.formattedValue, 'cake', 'ice-cream'),
+      strings.formatString(strings.formattedValue, 'cake', 'ice-cream')
     ).toEqual("I'd like some cake and ice-cream, or just cake");
   });
 
@@ -104,7 +106,7 @@ describe('Main Library Functions', () => {
   it('Format string in other language', () => {
     strings.setLanguage('it');
     expect(
-      strings.formatString(strings.formattedValue, 'torta', 'gelato'),
+      strings.formatString(strings.formattedValue, 'torta', 'gelato')
     ).toEqual("Vorrei un po' di torta e gelato, o solo torta");
   });
 
@@ -168,7 +170,7 @@ describe('Main Library Functions', () => {
           how: 'How do you want your egg todajsie?',
           boiledEgg: 'Boiled eggsie',
         },
-      }),
+      })
     );
 
     expect(strings.how).toEqual('How do you want your egg todajsie?');
@@ -183,14 +185,14 @@ describe('Main Library Functions', () => {
       year: '2018',
     };
     expect(strings.formatString(strings.currentDate, formatTokens)).toEqual(
-      'The current date is January 12, 2018!',
+      'The current date is January 12, 2018!'
     );
   });
 
   it('Handles falsy values', () => {
     // falsy: "{0} {1} {2} {3} {4} {5}"
     expect(
-      strings.formatString(strings.falsy, 0, false, '', null, undefined, NaN),
+      strings.formatString(strings.falsy, 0, false, '', null, undefined, NaN)
     ).toEqual([0, false, '', null, undefined, NaN].join(' '));
   });
 
@@ -198,7 +200,7 @@ describe('Main Library Functions', () => {
     expect(
       strings.formatString(strings.thisKeyDoesNotExist, {
         thisReplacement: 'doesNotExist',
-      }),
+      })
     ).toEqual('');
   });
 
@@ -220,9 +222,24 @@ describe('Main Library Functions', () => {
         '',
         null,
         undefined,
-        NaN,
-      ),
+        NaN
+      )
     ).toEqual([0, false, '', null, undefined, NaN].join(' '));
+  });
+
+  // Checks for arrays
+  it('Handle arrays', () => {
+    expect(strings.anArray).toEqual(['excellent', 'good', 'missing']);
+  });
+
+  it('Handle arrays', () => {
+    strings.setLanguage('it');
+    expect(strings.anArray).toEqual(['eccellente', 'buono', 'missing']);
+  });
+
+  it('Handle arrays', () => {
+    strings.setLanguage('whatever');
+    expect(strings.anArray).toEqual(['excellent', 'good', 'missing']);
   });
 });
 
@@ -236,7 +253,7 @@ describe('use the default getInterfaceLanguageMethod', () => {
         language: 'italian',
       },
     },
-    { logsEnabled: false },
+    { logsEnabled: false }
   );
   it('Use the default method that returns en-US', () => {
     expect(strings.language).toBe('english');
@@ -253,7 +270,7 @@ describe('use a custom getInterfaceLanguageMethod', () => {
         language: 'italian',
       },
     },
-    { customLanguageInterface: () => 'it-IT', logsEnabled: false },
+    { customLanguageInterface: () => 'it-IT', logsEnabled: false }
   );
   it('Use the custom method that returns it_IT', () => {
     expect(strings.language).toBe('italian');
@@ -270,7 +287,7 @@ describe('use psuedo characters', () => {
         language: 'english',
       },
     },
-    { pseudo: true, logsEnabled: false },
+    { pseudo: true, logsEnabled: false }
   );
   it('Psuedo changed value', () => {
     expect(strings.formatString('language')).not.toBe('english');

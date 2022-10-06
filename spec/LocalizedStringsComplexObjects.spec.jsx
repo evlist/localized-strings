@@ -14,7 +14,7 @@ const createElement = (tag, props, ...children) => {
     if (name.startsWith('on') && name.toLowerCase() in window)
       element.addEventListener(name.toLowerCase().substr(2), value);
     else element.setAttribute(name, value.toString());
-    if (name === 'key') element[name] = value.toString();
+    if (name === 'key') element[name] = value.toString(); // Added to simulate the behavior of React components...
   });
 
   children.forEach((child) => {
@@ -55,7 +55,19 @@ describe('Testing main Library Functions with complex objects', () => {
           b: 'bbb',
           c: 'in English only',
         },
+        plainObjectInArray: [
+          {
+            a: 'aaa',
+            b: 'bbb',
+            c: 'in English only',
+          },
+        ],
       },
+      plainObjectInFunction: () => ({
+        a: 'aaa',
+        b: 'bbb',
+        c: 'in English only',
+      }),
       it: {
         language: 'italian',
         jsxDom: <p>Come vuoi il tuo uovo oggi?</p>,
@@ -63,9 +75,35 @@ describe('Testing main Library Functions with complex objects', () => {
           a: 'aaa2',
           b: 'bbb2',
         },
+        plainObjectInArray: [
+          {
+            a: 'aaa2',
+            b: 'bbb2',
+          },
+        ],
+        plainObjectInFunction: () => ({
+          a: 'aaa2',
+          b: 'bbb2',
+        }),
       },
     };
     strings = new LocalizedStrings(allStrings, { logsEnabled: false });
+  });
+
+  it('checking an initial value of the allStrings object', () => {
+    expect(allStrings.it.plainObject).toEqual({
+      a: 'aaa2',
+      b: 'bbb2',
+    });
+  });
+
+  it('checking that setting a language mutates the initial allStrings object', () => {
+    strings.setLanguage('it');
+    expect(allStrings.it.plainObject).toEqual({
+      a: 'aaa2',
+      b: 'bbb2',
+      c: 'in English only',
+    });
   });
 
   it('checking plain objects from the default language', () => {
@@ -83,6 +121,25 @@ describe('Testing main Library Functions with complex objects', () => {
       a: 'aaa2',
       b: 'bbb2',
       c: 'in English only',
+    });
+  });
+
+  // Switch language
+  it('checking plain objects in an array existing in another language', () => {
+    strings.setLanguage('it');
+    expect(strings.plainObjectInArray[0]).toEqual({
+      a: 'aaa2',
+      b: 'bbb2',
+      c: 'in English only',
+    });
+  });
+
+  // Switch language
+  it('checking plain objects in a function existing in another language', () => {
+    strings.setLanguage('it');
+    expect(strings.plainObjectInFunction()).toEqual({
+      a: 'aaa2',
+      b: 'bbb2',
     });
   });
 
