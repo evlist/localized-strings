@@ -1,49 +1,42 @@
 import stopRecursion from '../lib/StopRecursion';
 import LocalizedStrings from '../lib/LocalizedStrings';
-import isPlainObject from 'lodash.isplainobject';
+
+// Used to check that 2 objects of different types have the same properties
+const canonicalize = (obj) => {
+  JSON.parse(JSON.stringify(obj));
+};
 
 describe('Testing stopRecursion,', () => {
-  it('that a plain object is no longer a plain object through stopRecursion', () => {
-    const isolated = stopRecursion({
-      excellent: 'excellent',
-      good: 'good',
-      missingComplex: 'missing value',
-    });
-    expect(isPlainObject(isolated)).toBeFalsy();
-  });
   it('that we can access plain object properties through stopRecursion', () => {
-    const isolated = stopRecursion({
+    const obj = {
       excellent: 'excellent',
       good: 'good',
       missingComplex: 'missing value',
-    });
-    expect(isolated).toEqual({
-      excellent: 'excellent',
-      good: 'good',
-      missingComplex: 'missing value',
-    });
+    };
+    const isolated = stopRecursion(JSON.parse(JSON.stringify(obj)));
+    expect(canonicalize(isolated)).toEqual(canonicalize(obj));
   });
-  it("that we can access the original object through stopRecursion's _value property", () => {
+  it("that we can access the original object through stopRecursion's valueOf() property", () => {
     const obj = {
       excellent: 'excellent',
       good: 'good',
       missingComplex: 'missing value',
     };
     const isolated = stopRecursion(obj);
-    expect(isolated._value).toBe(obj);
+    expect(isolated.valueOf()).toBe(obj);
   });
   it('that an array is no longer an array through stopRecursion', () => {
     const isolated = stopRecursion(['foo', 'bar']);
-    expect(isolated instanceof Array).toBeFalsy();
+    expect(Object.isExtensible(isolated)).toBeFalsy();
   });
-  it("that we can access array's menbers through stopRecursion", () => {
+  it("that we can access array's menmbers through stopRecursion", () => {
     const isolated = stopRecursion(['foo', 'bar']);
-    expect(isolated).toEqual(['foo', 'bar']);
+    expect(canonicalize(isolated)).toEqual(canonicalize({ 0: 'foo', 1: 'bar' }));
   });
-  it("that we can access the original array through stopRecursion's _value property", () => {
+  it("that we can access the original array through stopRecursion's valueOf() property", () => {
     const obj = ['foo', 'bar'];
     const isolated = stopRecursion(obj);
-    expect(isolated._value).toBe(obj);
+    expect(isolated.valueOf()).toBe(obj);
   });
 });
 
@@ -81,17 +74,25 @@ describe('Testing main Library in isolation', () => {
 
   // Default language
   it('Extract simple value from default language', () => {
-    expect(strings.ratings).toEqual({
-      excellent: 'excellent',
-      good: 'good',
-      missingComplex: 'missing value',
-    });
+    expect(canonicalize(strings.ratings)).toEqual(
+      canonicalize({
+        excellent: 'excellent',
+        good: 'good',
+        missingComplex: 'missing value',
+      })
+    );
   });
   it('Extract simple value from default language', () => {
     expect(strings.ratings).toBe(allStrings.en.ratings);
   });
   it('Extract simple value from default language', () => {
-    expect(strings.anArray).toEqual(['excellent', 'good', 'missing']);
+    expect(canonicalize(strings.anArray)).toEqual(
+      canonicalize({
+        0: 'excellent',
+        1: 'good',
+        2: 'missing',
+      })
+    );
   });
   it('Extract simple value from default language', () => {
     expect(strings.anArray).toBe(allStrings.en.anArray);
@@ -99,10 +100,12 @@ describe('Testing main Library in isolation', () => {
 
   it('Extract simple value from another language', () => {
     strings.setLanguage('it');
-    expect(strings.ratings).toEqual({
-      excellent: 'eccellente',
-      good: 'buono',
-    });
+    expect(canonicalize(strings.ratings)).toEqual(
+      canonicalize({
+        excellent: 'eccellente',
+        good: 'buono',
+      })
+    );
   });
   it('Extract simple value from another language', () => {
     strings.setLanguage('it');
@@ -110,7 +113,7 @@ describe('Testing main Library in isolation', () => {
   });
   it('Extract simple value from another language', () => {
     strings.setLanguage('it');
-    expect(strings.anArray).toEqual(['eccellente', 'buono']);
+    expect(canonicalize(strings.missingArray)).toEqual(canonicalize({ 0: 'good' }));
   });
   it('Extract simple value from another language', () => {
     strings.setLanguage('it');
@@ -119,7 +122,7 @@ describe('Testing main Library in isolation', () => {
 
   it('Extract simple value from a missing object in another language', () => {
     strings.setLanguage('it');
-    expect(strings.missingObject).toEqual({ excellent: 'excellent' });
+    expect(canonicalize(strings.missingObject)).toEqual(canonicalize({ excellent: 'excellent' }));
   });
   it('Extract simple value from a missing object another language', () => {
     strings.setLanguage('it');
@@ -127,7 +130,7 @@ describe('Testing main Library in isolation', () => {
   });
   it('Extract simple value from a missing object another language', () => {
     strings.setLanguage('it');
-    expect(strings.missingArray).toEqual(['good']);
+    expect(canonicalize(strings.missingArray)).toEqual(canonicalize({ 0: 'good' }));
   });
   it('Extract simple value from a missing object another language', () => {
     strings.setLanguage('it');

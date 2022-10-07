@@ -2,10 +2,15 @@
 
 import LocalizedStrings from '../lib/LocalizedStrings';
 import { JSDOM } from 'jsdom';
+import stopRecursion from '../lib/StopRecursion';
 
 global.window = new JSDOM('html').window;
 global.document = new JSDOM('html').window.document;
 
+/**
+ *
+ * These fonction are used to transform JSX tags into DOM elements
+ */
 const createElement = (tag, props, ...children) => {
   if (typeof tag === 'function') return tag(props, ...children);
   const element = document.createElement(tag);
@@ -31,6 +36,21 @@ const appendChild = (parent, child) => {
     parent.appendChild(child.nodeType ? child : document.createTextNode(child));
 };
 
+/**
+ *
+ * This fonction is used, for test purposes, to create objects which throw
+ * exceptions when one of their properties is updated
+ *
+ */
+const immutable = (obj) => {
+  const handler = {
+    set: () => {
+      throw 'This property cannot be updated';
+    },
+  };
+  return new Proxy(obj, handler);
+};
+
 describe('Testing main Library Functions with complex objects', () => {
   /**
    * Load up language file to use during tests
@@ -46,6 +66,13 @@ describe('Testing main Library Functions with complex objects', () => {
       en: {
         language: 'english',
         jsxDom: (
+          <div key='div'>
+            How do you want your egg
+            <br />
+            today?
+          </div>
+        ),
+        jsxDomStopRecursion: stopRecursion(
           <div key='div'>
             How do you want your egg
             <br />
@@ -70,6 +97,7 @@ describe('Testing main Library Functions with complex objects', () => {
           c: 'in English only',
         }),
         nonExtensible: { b: 5 },
+        throwsExceptions: { a: 1 },
       },
       it: {
         language: 'italian',
@@ -78,6 +106,7 @@ describe('Testing main Library Functions with complex objects', () => {
           a: 'aaa2',
           b: 'bbb2',
         },
+        jsxDomStopRecursion: stopRecursion(<p>Come vuoi il tuo uovo oggi?</p>),
         plainObjectInArray: [
           {
             a: 'aaa2',
@@ -89,6 +118,7 @@ describe('Testing main Library Functions with complex objects', () => {
           b: 'bbb2',
         }),
         nonExtensible: nonExtensible,
+        throwsExceptions: immutable({}),
       },
     };
     strings = new LocalizedStrings(allStrings, { logsEnabled: false });
@@ -147,7 +177,16 @@ describe('Testing main Library Functions with complex objects', () => {
   // Switch language
   it('checking JSX Dom nodes existing in another language', () => {
     strings.setLanguage('it');
-    expect(strings.jsxDom.key).toBeUndefined();
+    expect(strings.jsxDom.key).toEqual('div');
+  });
+
+  it('checking isolated JSX Dom nodes from the default language', () => {
+    expect(strings.jsxDomStopRecursion.key).toEqual('div');
+  });
+  // Switch language
+  it('checking isolated JSX Dom nodes existing in another language', () => {
+    strings.setLanguage('it');
+    expect(strings.jsxDomStopRecursion.key).toBeUndefined();
   });
 
   // Switch to non existing language
@@ -160,5 +199,11 @@ describe('Testing main Library Functions with complex objects', () => {
   it('checking non extensible objects', () => {
     strings.setLanguage('it');
     expect(strings.nonExtensible).toEqual({ a: 5 });
+  });
+
+  // Switch language
+  it('checking objects throwing errors when their properties are updated', () => {
+    strings.setLanguage('it');
+    expect(strings.throwsExceptions).toEqual({});
   });
 });
