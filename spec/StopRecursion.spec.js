@@ -31,12 +31,19 @@ describe('Testing stopRecursion,', () => {
   });
   it("that we can access array's menmbers through stopRecursion", () => {
     const isolated = stopRecursion(['foo', 'bar']);
-    expect(canonicalize(isolated)).toEqual(canonicalize({ 0: 'foo', 1: 'bar' }));
+    expect(canonicalize(isolated)).toEqual(
+      canonicalize({ 0: 'foo', 1: 'bar' })
+    );
   });
   it("that we can access the original array through stopRecursion's valueOf() property", () => {
     const obj = ['foo', 'bar'];
     const isolated = stopRecursion(obj);
     expect(isolated.valueOf()).toBe(obj);
+  });
+  it("that object's methods can be used", () => {
+    const obj = new Date();
+    const isolated = stopRecursion(obj);
+    expect(isolated.toISOString()).toEqual(obj.toISOString());
   });
 });
 
@@ -113,7 +120,9 @@ describe('Testing main Library in isolation', () => {
   });
   it('Extract simple value from another language', () => {
     strings.setLanguage('it');
-    expect(canonicalize(strings.missingArray)).toEqual(canonicalize({ 0: 'good' }));
+    expect(canonicalize(strings.missingArray)).toEqual(
+      canonicalize({ 0: 'good' })
+    );
   });
   it('Extract simple value from another language', () => {
     strings.setLanguage('it');
@@ -122,7 +131,9 @@ describe('Testing main Library in isolation', () => {
 
   it('Extract simple value from a missing object in another language', () => {
     strings.setLanguage('it');
-    expect(canonicalize(strings.missingObject)).toEqual(canonicalize({ excellent: 'excellent' }));
+    expect(canonicalize(strings.missingObject)).toEqual(
+      canonicalize({ excellent: 'excellent' })
+    );
   });
   it('Extract simple value from a missing object another language', () => {
     strings.setLanguage('it');
@@ -130,7 +141,9 @@ describe('Testing main Library in isolation', () => {
   });
   it('Extract simple value from a missing object another language', () => {
     strings.setLanguage('it');
-    expect(canonicalize(strings.missingArray)).toEqual(canonicalize({ 0: 'good' }));
+    expect(canonicalize(strings.missingArray)).toEqual(
+      canonicalize({ 0: 'good' })
+    );
   });
   it('Extract simple value from a missing object another language', () => {
     strings.setLanguage('it');
